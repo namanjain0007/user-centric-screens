@@ -25,11 +25,12 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-            {/* Placeholder routes - these would be implemented in a complete app */}
-            <Route path="/attendance" element={<div className="text-center py-20">Attendance Page - Coming Soon</div>} />
-            <Route path="/project" element={<div className="text-center py-20">Project Management - Coming Soon</div>} />
-            <Route path="/timesheet" element={<div className="text-center py-20">Timesheet - Coming Soon</div>} />
+            {/* New and updated routes */}
+            <Route path="/admin" element={<div className="text-center py-20">Admin Management - Coming Soon</div>} />
+            <Route path="/categories" element={<div className="text-center py-20">Categories - Coming Soon</div>} />
+            <Route path="/listings" element={<div className="text-center py-20">Listing Management - Coming Soon</div>} />
             <Route path="/payments" element={<div className="text-center py-20">Payments - Coming Soon</div>} />
+            <Route path="/pricing" element={<div className="text-center py-20">Pricing Plans - Coming Soon</div>} />
             <Route path="/settings" element={<div className="text-center py-20">Settings - Coming Soon</div>} />
             <Route path="/help" element={<div className="text-center py-20">Help & Support - Coming Soon</div>} />
           </Route>

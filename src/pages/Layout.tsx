@@ -10,12 +10,13 @@ export default function Layout() {
   // Get the current page title based on the route
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === "/users") return "Users Management";
+    if (path === "/users") return "User Management";
+    if (path === "/admin") return "Admin Management";
     if (path === "/notifications") return "Notifications";
-    if (path === "/attendance") return "Attendance";
-    if (path === "/project") return "Projects";
-    if (path === "/timesheet") return "Timesheet";
+    if (path === "/categories") return "Categories";
+    if (path === "/listings") return "Listing Management";
     if (path === "/payments") return "Payments";
+    if (path === "/pricing") return "Pricing Plans";
     if (path === "/settings") return "Settings";
     if (path === "/help") return "Help & Support";
     return "Dashboard";

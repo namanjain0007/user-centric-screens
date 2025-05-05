@@ -6,14 +6,14 @@ import {
   Users,
   LayoutDashboard,
   Bell,
-  Clock,
-  Folder,
-  UserSquare,
-  CalendarDays,
-  CreditCard,
   Settings,
   HelpCircle,
+  CreditCard,
   Search,
+  Category,
+  ListOrdered,
+  Shield,
+  DollarSign,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -66,8 +66,8 @@ export function Sidebar() {
   };
 
   return (
-    <div className="hidden md:flex h-full w-64 flex-col border-r bg-sidebar">
-      <div className="flex h-14 items-center border-b px-4">
+    <div className="hidden md:flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar">
+      <div className="flex h-14 items-center border-b border-sidebar-border px-4">
         <Link 
           to="/" 
           className="flex items-center gap-2 font-semibold text-lg text-sidebar-foreground"
@@ -86,7 +86,7 @@ export function Sidebar() {
           />
         </div>
 
-        <NavSection title="General">
+        <NavSection title="Dashboard">
           <NavItem
             href="/dashboard"
             icon={<LayoutDashboard className="h-4 w-4" />}
@@ -99,42 +99,54 @@ export function Sidebar() {
             title="Notifications"
             isActive={isActive("/notifications")}
           />
-          <NavItem
-            href="/attendance"
-            icon={<Clock className="h-4 w-4" />}
-            title="Attendance"
-            isActive={isActive("/attendance")}
-          />
         </NavSection>
 
-        <NavSection title="Management">
-          <NavItem
-            href="/project"
-            icon={<Folder className="h-4 w-4" />}
-            title="Project"
-            isActive={isActive("/project")}
-          />
+        <NavSection title="User Management">
           <NavItem
             href="/users"
             icon={<Users className="h-4 w-4" />}
-            title="Users"
+            title="User Management"
             isActive={isActive("/users")}
           />
           <NavItem
-            href="/timesheet"
-            icon={<CalendarDays className="h-4 w-4" />}
-            title="Timesheet"
-            isActive={isActive("/timesheet")}
+            href="/admin"
+            icon={<Shield className="h-4 w-4" />}
+            title="Admin Management"
+            isActive={isActive("/admin")}
           />
         </NavSection>
 
-        <NavSection title="Company">
+        <NavSection title="Content">
+          <NavItem
+            href="/categories"
+            icon={<Category className="h-4 w-4" />}
+            title="Categories"
+            isActive={isActive("/categories")}
+          />
+          <NavItem
+            href="/listings"
+            icon={<ListOrdered className="h-4 w-4" />}
+            title="Listing Management"
+            isActive={isActive("/listings")}
+          />
+        </NavSection>
+
+        <NavSection title="Billing">
           <NavItem
             href="/payments"
             icon={<CreditCard className="h-4 w-4" />}
             title="Payments"
             isActive={isActive("/payments")}
           />
+          <NavItem
+            href="/pricing"
+            icon={<DollarSign className="h-4 w-4" />}
+            title="Pricing Plans"
+            isActive={isActive("/pricing")}
+          />
+        </NavSection>
+
+        <NavSection title="System">
           <NavItem
             href="/settings"
             icon={<Settings className="h-4 w-4" />}

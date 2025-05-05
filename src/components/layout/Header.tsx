@@ -23,7 +23,7 @@ export function Header({ title }: HeaderProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-sidebar-border bg-sidebar/50 backdrop-blur-sm px-4 sm:px-6">
       <Sheet>
         <SheetTrigger asChild>
           <Button

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -10,10 +9,10 @@ import {
   HelpCircle,
   CreditCard,
   Search,
-  Category,
   ListOrdered,
   Shield,
   DollarSign,
+  FolderTree,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -119,7 +118,7 @@ export function Sidebar() {
         <NavSection title="Content">
           <NavItem
             href="/categories"
-            icon={<Category className="h-4 w-4" />}
+            icon={<FolderTree className="h-4 w-4" />}
             title="Categories"
             isActive={isActive("/categories")}
           />

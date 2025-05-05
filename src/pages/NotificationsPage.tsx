@@ -8,9 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CheckCheck, Bell } from "lucide-react";
+import { CheckCheck, Bell, InfoIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface Notification {
   id: string;
@@ -120,6 +121,14 @@ export default function NotificationsPage() {
           Mark all as read
         </Button>
       </div>
+      
+      <Alert className="bg-blue-50 border-blue-200">
+        <InfoIcon className="h-4 w-4" />
+        <AlertTitle>Info</AlertTitle>
+        <AlertDescription>
+          You can now access your notifications quickly from the header. Look for the bell icon in the top-right corner.
+        </AlertDescription>
+      </Alert>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>

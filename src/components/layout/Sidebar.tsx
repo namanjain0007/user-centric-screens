@@ -1,10 +1,10 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   Users,
   LayoutDashboard,
-  Bell,
   Settings,
   HelpCircle,
   CreditCard,
@@ -91,12 +91,6 @@ export function Sidebar() {
             icon={<LayoutDashboard className="h-4 w-4" />}
             title="Dashboard"
             isActive={isActive("/dashboard")}
-          />
-          <NavItem
-            href="/notifications"
-            icon={<Bell className="h-4 w-4" />}
-            title="Notifications"
-            isActive={isActive("/notifications")}
           />
         </NavSection>
 

@@ -10,6 +10,7 @@ import UsersPage from "./pages/UsersPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { NotificationButton } from "./components/layout/NotificationButton";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <NotificationButton />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route element={<Layout />}>

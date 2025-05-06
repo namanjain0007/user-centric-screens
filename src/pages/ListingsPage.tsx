@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Search, Filter, ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -355,7 +354,7 @@ export default function ListingsPage() {
                           <Calendar
                             mode="range"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(value: any) => field.onChange(value || { from: undefined, to: undefined })}
                             className="rounded-md border pointer-events-auto"
                             numberOfMonths={1}
                           />

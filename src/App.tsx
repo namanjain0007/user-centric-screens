@@ -17,6 +17,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    {/* Ensure TooltipProvider is properly used as a component */}
     <TooltipProvider>
       <Toaster />
       <Sonner />

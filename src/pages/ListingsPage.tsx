@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Search, Filter, ArrowDown, ArrowUp, Trash2 } from "lucide-react";
+import { Search, Filter, ArrowDown, ArrowUp, Trash2, Plus, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,12 +49,29 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateRange } from "react-day-picker";
+import { ListingFormModal, ListingFormValues } from "@/components/listings/ListingFormModal";
+
+// Define the full listing type including description field
+interface Listing {
+  id: number;
+  title: string;
+  description?: string;
+  category: string;
+  location: string;
+  price: number;
+  availableFrom: Date;
+  availableUntil: Date;
+  vendorEmail: string;
+  status: string;
+  image?: File | null;
+}
 
 // Mock data for listings
-const mockListings = [
+const mockListings: Listing[] = [
   {
     id: 1,
     title: "Indoor Succulent Plants",
+    description: "Beautiful indoor plants that require minimal maintenance.",
     category: "Plant",
     location: "San Francisco",
     price: 46,
@@ -66,6 +83,7 @@ const mockListings = [
   {
     id: 2,
     title: "Cartoon Press Pen",
+    description: "Stylish cartoon pens with smooth writing experience.",
     category: "Gadget",
     location: "New York",
     price: 22,
@@ -145,7 +163,7 @@ const mockListings = [
 // Filter schema
 const filterSchema = z.object({
   dateRange: z.object({
-    from: z.date(),
+    from: z.date().optional(),
     to: z.date().optional(),
   }).optional(),
   category: z.string().optional(),
@@ -154,10 +172,12 @@ const filterSchema = z.object({
 
 export default function ListingsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [listings, setListings] = useState(mockListings);
+  const [listings, setListings] = useState<Listing[]>(mockListings);
   const [sortOption, setSortOption] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingListing, setEditingListing] = useState<Listing | null>(null);
 
   // Filter form
   const filterForm = useForm<z.infer<typeof filterSchema>>({
@@ -225,7 +245,7 @@ export default function ListingsPage() {
     }
 
     // Apply date range filter
-    if (filters.dateRange) {
+    if (filters.dateRange && (filters.dateRange.from || filters.dateRange.to)) {
       filtered = filtered.filter(item => {
         const { from, to } = filters.dateRange || {};
         
@@ -233,6 +253,8 @@ export default function ListingsPage() {
           return item.availableFrom >= from && item.availableUntil <= to;
         } else if (from) {
           return item.availableFrom >= from;
+        } else if (to) {
+          return item.availableUntil <= to;
         }
         return true;
       });
@@ -250,6 +272,49 @@ export default function ListingsPage() {
   const handleDelete = (id: number) => {
     const updatedListings = listings.filter(item => item.id !== id);
     setListings(updatedListings);
+  };
+
+  // Handle adding a new listing
+  const handleAddListing = () => {
+    setEditingListing(null);
+    setIsModalOpen(true);
+  };
+
+  // Handle editing a listing
+  const handleEditListing = (listing: Listing) => {
+    setEditingListing(listing);
+    setIsModalOpen(true);
+  };
+
+  // Handle form submission (both add and edit)
+  const handleSubmitForm = (data: ListingFormValues) => {
+    if (editingListing) {
+      // Update existing listing
+      const updatedListings = listings.map(item => 
+        item.id === editingListing.id 
+          ? { ...item, ...data } 
+          : item
+      );
+      setListings(updatedListings);
+    } else {
+      // Add new listing
+      const newListing: Listing = {
+        id: Math.max(...listings.map(item => item.id)) + 1,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        location: data.location,
+        price: data.price,
+        availableFrom: data.availableFrom,
+        availableUntil: data.availableUntil,
+        vendorEmail: "new@example.com", // Default vendor email
+        status: "in-stock", // Default status
+        image: data.image,
+      };
+      setListings([...listings, newListing]);
+    }
+    setIsModalOpen(false);
+    setEditingListing(null);
   };
 
   // Pagination
@@ -273,129 +338,139 @@ export default function ListingsPage() {
     <div className="space-y-6">
       <Card className="shadow-sm">
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-            {/* Search bar */}
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <Input
-                type="text"
-                placeholder="Search listings..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={handleSearch}
-              />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+              {/* Search bar */}
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <Input
+                  type="text"
+                  placeholder="Search listings..."
+                  className="pl-10"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                />
+              </div>
+              
+              {/* Filters popover */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Filter size={16} />
+                    <span>Filters</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-4">
+                  <Form {...filterForm}>
+                    <form onSubmit={filterForm.handleSubmit(onFilterSubmit)} className="space-y-4">
+                      <h4 className="font-medium mb-2">Filter Listings</h4>
+                      
+                      {/* Category filter */}
+                      <FormField
+                        control={filterForm.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <FormControl>
+                              <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                {...field}
+                              >
+                                <option value="">All Categories</option>
+                                {categories.map(category => (
+                                  <option key={category} value={category}>{category}</option>
+                                ))}
+                              </select>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Location filter */}
+                      <FormField
+                        control={filterForm.control}
+                        name="location"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Location</FormLabel>
+                            <FormControl>
+                              <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                {...field}
+                              >
+                                <option value="">All Locations</option>
+                                {locations.map(location => (
+                                  <option key={location} value={location}>{location}</option>
+                                ))}
+                              </select>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      {/* Date Range */}
+                      <FormField
+                        control={filterForm.control}
+                        name="dateRange"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Availability Date Range</FormLabel>
+                            <Calendar
+                              mode="range"
+                              selected={field.value as DateRange}
+                              onSelect={(value) => {
+                                field.onChange(value || undefined);
+                              }}
+                              className="rounded-md border"
+                              numberOfMonths={1}
+                              classNames={{
+                                root: "p-3 pointer-events-auto"
+                              }}
+                            />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <Button type="submit" className="w-full mt-4">Apply Filters</Button>
+                    </form>
+                  </Form>
+                </PopoverContent>
+              </Popover>
+              
+              {/* Sort dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <span>Sort</span>
+                    {sortOption === "price-asc" || sortOption === "available-soon" ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleSort("price-asc")}>
+                    Price: Low to High
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort("price-desc")}>
+                    Price: High to Low
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort("date-desc")}>
+                    Recently Added
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleSort("available-soon")}>
+                    Available Soon
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             
-            {/* Filters popover */}
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Filter size={16} />
-                  <span>Filters</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-4">
-                <Form {...filterForm}>
-                  <form onSubmit={filterForm.handleSubmit(onFilterSubmit)} className="space-y-4">
-                    <h4 className="font-medium mb-2">Filter Listings</h4>
-                    
-                    {/* Category filter */}
-                    <FormField
-                      control={filterForm.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Category</FormLabel>
-                          <FormControl>
-                            <select
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                              {...field}
-                            >
-                              <option value="">All Categories</option>
-                              {categories.map(category => (
-                                <option key={category} value={category}>{category}</option>
-                              ))}
-                            </select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Location filter */}
-                    <FormField
-                      control={filterForm.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Location</FormLabel>
-                          <FormControl>
-                            <select
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                              {...field}
-                            >
-                              <option value="">All Locations</option>
-                              {locations.map(location => (
-                                <option key={location} value={location}>{location}</option>
-                              ))}
-                            </select>
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Date Range */}
-                    <FormField
-                      control={filterForm.control}
-                      name="dateRange"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <FormLabel>Availability Date Range</FormLabel>
-                          <Calendar
-                            mode="range"
-                            selected={field.value as DateRange}
-                            onSelect={(value) => {
-                              if (value?.from) {
-                                field.onChange(value);
-                              } else {
-                                field.onChange(undefined);
-                              }
-                            }}
-                            className="rounded-md border"
-                            numberOfMonths={1}
-                          />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <Button type="submit" className="w-full mt-4">Apply Filters</Button>
-                  </form>
-                </Form>
-              </PopoverContent>
-            </Popover>
-            
-            {/* Sort dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <span>Sort</span>
-                  {sortOption === "price-asc" || sortOption === "available-soon" ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleSort("price-asc")}>
-                  Price: Low to High
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("price-desc")}>
-                  Price: High to Low
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("date-desc")}>
-                  Recently Added
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("available-soon")}>
-                  Available Soon
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Add Listing Button */}
+            <Button 
+              onClick={handleAddListing}
+              className="bg-brand-purple hover:bg-brand-purple/90 text-white ml-auto"
+            >
+              <Plus size={16} className="mr-2" />
+              Add Listing
+            </Button>
           </div>
 
           {/* Listings table */}
@@ -410,7 +485,7 @@ export default function ListingsPage() {
                   <TableHead>Availability</TableHead>
                   <TableHead>Vendor Email</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -427,7 +502,16 @@ export default function ListingsPage() {
                     <TableCell>
                       <StatusBadge status={listing.status} />
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditListing(listing)}
+                        className="hover:bg-secondary"
+                      >
+                        <Pencil size={18} />
+                        <span className="sr-only">Edit</span>
+                      </Button>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -488,6 +572,15 @@ export default function ListingsPage() {
           )}
         </CardContent>
       </Card>
+      
+      {/* Listing Form Modal */}
+      <ListingFormModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        onSubmit={handleSubmitForm}
+        initialValues={editingListing || undefined}
+        isEditing={!!editingListing}
+      />
     </div>
   );
 }

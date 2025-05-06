@@ -9,7 +9,6 @@ import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ListingsPage from "./pages/ListingsPage";
-import AddListingPage from "./pages/AddListingPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -17,7 +16,6 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    {/* Ensure TooltipProvider is properly used as a component */}
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -28,7 +26,6 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/listings" element={<ListingsPage />} />
-            <Route path="/listings/add" element={<AddListingPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             {/* New and updated routes */}
             <Route path="/admin" element={<div className="text-center py-20">Admin Management - Coming Soon</div>} />

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -92,12 +93,6 @@ export function Sidebar() {
             title="Dashboard"
             isActive={isActive("/dashboard")}
           />
-          <NavItem
-            href="/notifications"
-            icon={<Bell className="h-4 w-4" />}
-            title="Notifications"
-            isActive={isActive("/notifications")}
-          />
         </NavSection>
 
         <NavSection title="User Management">
@@ -151,6 +146,12 @@ export function Sidebar() {
             icon={<Settings className="h-4 w-4" />}
             title="Settings"
             isActive={isActive("/settings")}
+          />
+          <NavItem
+            href="/notifications"
+            icon={<Bell className="h-4 w-4" />}
+            title="Notifications"
+            isActive={isActive("/notifications")}
           />
           <NavItem
             href="/help"

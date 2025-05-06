@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Search, Filter, ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,7 @@ import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DateRange } from "react-day-picker";
 
 // Mock data for listings
 const mockListings = [
@@ -143,7 +145,7 @@ const mockListings = [
 // Filter schema
 const filterSchema = z.object({
   dateRange: z.object({
-    from: z.date().optional(),
+    from: z.date(),
     to: z.date().optional(),
   }).optional(),
   category: z.string().optional(),
@@ -161,7 +163,7 @@ export default function ListingsPage() {
   const filterForm = useForm<z.infer<typeof filterSchema>>({
     resolver: zodResolver(filterSchema),
     defaultValues: {
-      dateRange: { from: undefined, to: undefined },
+      dateRange: undefined,
       category: "",
       location: "",
     },
@@ -223,17 +225,14 @@ export default function ListingsPage() {
     }
 
     // Apply date range filter
-    if (filters.dateRange?.from || filters.dateRange?.to) {
+    if (filters.dateRange) {
       filtered = filtered.filter(item => {
-        const from = filters.dateRange?.from;
-        const to = filters.dateRange?.to;
-
+        const { from, to } = filters.dateRange || {};
+        
         if (from && to) {
           return item.availableFrom >= from && item.availableUntil <= to;
         } else if (from) {
           return item.availableFrom >= from;
-        } else if (to) {
-          return item.availableUntil <= to;
         }
         return true;
       });
@@ -353,9 +352,15 @@ export default function ListingsPage() {
                           <FormLabel>Availability Date Range</FormLabel>
                           <Calendar
                             mode="range"
-                            selected={field.value}
-                            onSelect={(value: any) => field.onChange(value || { from: undefined, to: undefined })}
-                            className="rounded-md border pointer-events-auto"
+                            selected={field.value as DateRange}
+                            onSelect={(value) => {
+                              if (value?.from) {
+                                field.onChange(value);
+                              } else {
+                                field.onChange(undefined);
+                              }
+                            }}
+                            className="rounded-md border"
                             numberOfMonths={1}
                           />
                         </FormItem>

@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
-import NotificationsPage from "./pages/NotificationsPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { NotificationButton } from "./components/layout/NotificationButton";
@@ -26,7 +25,6 @@ const App = () => (
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/users" element={<UsersPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
             {/* New and updated routes */}
             <Route path="/admin" element={<div className="text-center py-20">Admin Management - Coming Soon</div>} />
             <Route path="/categories" element={<div className="text-center py-20">Categories - Coming Soon</div>} />

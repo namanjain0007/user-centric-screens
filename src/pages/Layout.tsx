@@ -12,7 +12,6 @@ export default function Layout() {
     const path = location.pathname;
     if (path === "/users") return "User Management";
     if (path === "/admin") return "Admin Management";
-    if (path === "/notifications") return "Notifications";
     if (path === "/categories") return "Categories";
     if (path === "/listings") return "Listing Management";
     if (path === "/payments") return "Payments";

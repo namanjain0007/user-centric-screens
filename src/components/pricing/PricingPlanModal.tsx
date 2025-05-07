@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { PricingPlan } from "@/types";
-import { Radio, RadioGroup } from "@/components/ui/radio";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface PricingPlanModalProps {
   open: boolean;
@@ -91,11 +90,11 @@ export function PricingPlanModal({
               className="flex space-x-4"
             >
               <div className="flex items-center space-x-2">
-                <Radio id="monthly" value="Monthly" />
+                <RadioGroupItem id="monthly" value="Monthly" />
                 <Label htmlFor="monthly">Monthly</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <Radio id="yearly" value="Yearly" />
+                <RadioGroupItem id="yearly" value="Yearly" />
                 <Label htmlFor="yearly">Yearly</Label>
               </div>
             </RadioGroup>

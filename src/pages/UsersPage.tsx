@@ -167,7 +167,7 @@ export default function UsersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.role === "Owner" ? "brand-purple" : "secondary"}>
+                    <Badge variant={user.role === "Owner" ? "default" : "secondary"}>
                       {user.role}
                     </Badge>
                   </TableCell>

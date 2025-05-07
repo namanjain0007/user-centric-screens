@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog,
@@ -249,7 +248,7 @@ export default function AdminUsersPage() {
                   <TableCell>
                     <Badge 
                       variant={
-                        admin.role === "Sub Admin" ? "brand-purple" : 
+                        admin.role === "Sub Admin" ? "default" : 
                         admin.role === "Manager" ? "secondary" : "outline"
                       }
                     >

@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ListingsPage from "./pages/ListingsPage";
+import PricingPlansPage from "./pages/PricingPlansPage";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -27,11 +28,11 @@ const App = () => (
             <Route path="/users" element={<UsersPage />} />
             <Route path="/listings" element={<ListingsPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/pricing" element={<PricingPlansPage />} />
             {/* New and updated routes */}
             <Route path="/admin" element={<div className="text-center py-20">Admin Management - Coming Soon</div>} />
             <Route path="/categories" element={<div className="text-center py-20">Categories - Coming Soon</div>} />
             <Route path="/payments" element={<div className="text-center py-20">Payments - Coming Soon</div>} />
-            <Route path="/pricing" element={<div className="text-center py-20">Pricing Plans - Coming Soon</div>} />
             <Route path="/settings" element={<div className="text-center py-20">Settings - Coming Soon</div>} />
             <Route path="/help" element={<div className="text-center py-20">Help & Support - Coming Soon</div>} />
           </Route>

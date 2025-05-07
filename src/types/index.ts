@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -7,4 +6,11 @@ export interface User {
   status: "active" | "away" | "offline" | "blocked";
   role: string;
   lastActive: string;
+}
+
+export interface PricingPlan {
+  id: string;
+  name: string;
+  price: number;
+  duration: "Monthly" | "Yearly";
 }

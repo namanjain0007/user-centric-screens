@@ -67,14 +67,14 @@ const topProducts = [
   },
   {
     id: "3",
-    name: "4K UHD TV Samsung GE43QN90A 43"",
+    name: '4K UHD TV Samsung GE43QN90A 43"',
     articleNumber: "98517598",
     sales: 564,
     image: "/placeholder.svg",
   },
   {
     id: "4",
-    name: "15.6" Gaming Laptop ThunderRobot 911",
+    name: '15.6" Gaming Laptop ThunderRobot 911',
     articleNumber: "56064257",
     sales: 525,
     image: "/placeholder.svg",

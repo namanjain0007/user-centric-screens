@@ -102,12 +102,6 @@ export function Sidebar() {
             title="User Management"
             isActive={isActive("/users")}
           />
-          <NavItem
-            href="/admin"
-            icon={<Shield className="h-4 w-4" />}
-            title="Admin Management"
-            isActive={isActive("/admin")}
-          />
         </NavSection>
 
         <NavSection title="Content">
@@ -141,6 +135,12 @@ export function Sidebar() {
         </NavSection>
 
         <NavSection title="System">
+          <NavItem
+            href="/admin"
+            icon={<Shield className="h-4 w-4" />}
+            title="Admin Users"
+            isActive={isActive("/admin")}
+          />
           <NavItem
             href="/settings"
             icon={<Settings className="h-4 w-4" />}

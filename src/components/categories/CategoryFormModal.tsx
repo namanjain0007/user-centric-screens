@@ -1,17 +1,41 @@
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import React from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+  name: z.string().min(1, "Category name is required").max(50),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface CategoryFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (name: string) => void;
+  onSubmit: (name: string) => Promise<boolean | void>;
   initialValue?: string;
   mode: "add" | "edit";
+  buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link" | "brand-purple";
 }
 
 export function CategoryFormModal({
@@ -19,87 +43,83 @@ export function CategoryFormModal({
   onOpenChange,
   onSubmit,
   initialValue = "",
-  mode,
+  mode = "add",
+  buttonVariant = "default",
 }: CategoryFormModalProps) {
-  const [name, setName] = useState(initialValue);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: initialValue,
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!name.trim()) {
-      toast({
-        title: "Error",
-        description: "Category name cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+  const handleSubmit = async (values: FormValues) => {
     try {
-      await onSubmit(name);
-      toast({
-        title: "Success",
-        description: `Category ${mode === "add" ? "created" : "updated"} successfully`,
-      });
-      onOpenChange(false);
-      setName("");
+      const result = await onSubmit(values.name);
+      if (result !== false) {
+        toast.success(`Category ${mode === "add" ? "added" : "updated"} successfully`);
+        form.reset();
+        onOpenChange(false);
+      }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: `Failed to ${mode === "add" ? "create" : "update"} category`,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+      toast.error(`Failed to ${mode} category`);
     }
   };
 
+  React.useEffect(() => {
+    if (open && initialValue) {
+      form.setValue("name", initialValue);
+    } else if (!open) {
+      form.reset();
+    }
+  }, [open, initialValue, form]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-lg">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
-            {mode === "add" ? "Add New Category" : "Edit Category"}
+          <DialogTitle>
+            {mode === "add" ? "Add Category" : "Edit Category"}
           </DialogTitle>
+          <DialogDescription>
+            {mode === "add"
+              ? "Add a new category to your store."
+              : "Edit the category name."}
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Category Name</Label>
-              <Input
-                id="name"
-                placeholder="Enter category name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="border-input"
-                autoComplete="off"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="mr-2"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={isSubmitting} 
-              variant="brand-purple"
-              className="px-6"
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </Button>
-          </DialogFooter>
-        </form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter category name"
+                      {...field}
+                      autoFocus
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant={buttonVariant}>
+                {mode === "add" ? "Add Category" : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

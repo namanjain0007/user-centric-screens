@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Bell, ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,15 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
-import { NotificationsPanel } from "../notifications/NotificationsPanel";
 
 interface HeaderProps {
   title: string;
 }
 
 export function Header({ title }: HeaderProps) {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-sidebar-border bg-sidebar/50 backdrop-blur-sm px-4 sm:px-6">
       <Sheet>
@@ -43,18 +40,6 @@ export function Header({ title }: HeaderProps) {
       <h1 className="text-xl font-semibold">{title}</h1>
 
       <div className="ml-auto flex items-center gap-2">
-        <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-brand-red ring-2 ring-background"></span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full max-w-sm sm:max-w-md p-0">
-            <NotificationsPanel onClose={() => setNotificationsOpen(false)} />
-          </SheetContent>
-        </Sheet>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2">

@@ -89,7 +89,7 @@ export default function PricingPlansPage() {
           variant="brand-purple"
           className="animate-fade-in"
         >
-          <Plus size={16} />
+          <Plus size={16} className="mr-1" />
           Add Plan
         </Button>
       </div>
@@ -107,6 +107,7 @@ export default function PricingPlansPage() {
         onOpenChange={setIsModalOpen}
         initialData={currentPlan}
         onSubmit={handleSubmitPlan}
+        buttonVariant="brand-purple"
       />
     </div>
   );

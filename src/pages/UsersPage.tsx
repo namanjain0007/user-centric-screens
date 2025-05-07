@@ -18,13 +18,24 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, Users as UsersIcon } from "lucide-react";
 import { UserStatusBadge } from "@/components/users/UserStatusBadge";
+import { Card } from "@/components/ui/card";
+import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
 
 // Sample user data for demo purposes
 const sampleUsers: User[] = [
@@ -77,36 +88,33 @@ const sampleUsers: User[] = [
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [users, setUsers] = useState<User[]>(sampleUsers);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Filter users based on search term
-  const filteredUsers = sampleUsers.filter(user =>
+  const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle checkbox selection
-  const handleCheckboxChange = (userId: string) => {
-    setSelectedUsers(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
+  // Handle delete user
+  const handleDeleteClick = (userId: string) => {
+    setUserToDelete(userId);
+    setIsDeleteDialogOpen(true);
   };
 
-  // Handle select all
-  const handleSelectAll = () => {
-    if (selectedUsers.length === filteredUsers.length) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(filteredUsers.map(user => user.id));
+  const confirmDelete = () => {
+    if (userToDelete) {
+      setUsers(users.filter(user => user.id !== userToDelete));
+      setUserToDelete(null);
+      setIsDeleteDialogOpen(false);
     }
   };
 
-  // Handle delete user
-  const handleDeleteUser = (userId: string) => {
-    console.log(`Delete user with id: ${userId}`);
-    // In a real application, this would call an API to delete the user
-  };
+  // Statistics for cards
+  const totalUsers = users.length;
+  const activeUsers = users.filter(user => user.status === "active").length;
+  const newUsers = 3; // Assuming this is a static value for demo purposes
 
   return (
     <div className="space-y-6">
@@ -123,17 +131,39 @@ export default function UsersPage() {
           />
         </div>
       </div>
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <DashboardStatCard 
+          title="Total Users" 
+          value={totalUsers.toString()} 
+          icon={<UsersIcon className="h-full w-full text-current" />}
+          bgColor="bg-blue-100"
+          iconColor="text-blue-600"
+        />
+        <DashboardStatCard 
+          title="New Users" 
+          value={newUsers.toString()} 
+          change={{ value: "2 this week", isPositive: true }}
+          icon={<UsersIcon className="h-full w-full text-current" />}
+          bgColor="bg-green-100"
+          iconColor="text-green-600"
+        />
+        <DashboardStatCard 
+          title="Active Users" 
+          value={activeUsers.toString()} 
+          change={{ value: `${Math.round((activeUsers/totalUsers)*100)}% of total`, isPositive: true }}
+          icon={<UsersIcon className="h-full w-full text-current" />}
+          bgColor="bg-purple-100"
+          iconColor="text-purple-600"
+        />
+      </div>
+
       <div className="space-y-4">
-        <div className="rounded-md border shadow-sm">
+        <Card className="shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">
-                  <Checkbox 
-                    checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
                 <TableHead>User</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Last Active</TableHead>
@@ -141,53 +171,55 @@ export default function UsersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Checkbox 
-                      checked={selectedUsers.includes(user.id)}
-                      onCheckedChange={() => handleCheckboxChange(user.id)}
-                    />
-                  </TableCell>
-                  <TableCell className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>
-                        {user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={user.role === "Owner" ? "default" : "secondary"}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{user.lastActive}</TableCell>
-                  <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
+              {filteredUsers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
+                    No users found
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                filteredUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={user.role === "Owner" ? "default" : "secondary"}>
+                        {user.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{user.lastActive}</TableCell>
+                    <TableCell>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDeleteClick(user.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
-        </div>
+        </Card>
         
         <div className="flex items-center justify-end space-x-2">
           <Pagination>
@@ -214,6 +246,24 @@ export default function UsersPage() {
           </Pagination>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm to delete this user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the user account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600">
+              Yes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -94,7 +94,7 @@ export default function CategoriesPage() {
         <Button 
           onClick={() => setIsAddModalOpen(true)}
           variant="brand-purple"
-          className="px-4"
+          className="animate-fade-in"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add Category
@@ -113,6 +113,7 @@ export default function CategoriesPage() {
         onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddCategory}
         mode="add"
+        buttonVariant="brand-purple"
       />
 
       {categoryToEdit && (
@@ -122,6 +123,7 @@ export default function CategoriesPage() {
           onSubmit={handleEditCategory}
           initialValue={categoryToEdit.name}
           mode="edit"
+          buttonVariant="brand-purple"
         />
       )}
     </div>

@@ -1,184 +1,121 @@
 
-import React from "react";
-import { useForm } from "react-hook-form";
-import { PricingPlan } from "@/types";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { PricingPlan } from "@/types";
+import { Radio, RadioGroup } from "@/components/ui/radio";
 
 interface PricingPlanModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData: PricingPlan | null;
-  onSubmit: (data: PricingPlan) => void;
+  initialData?: PricingPlan | null;
+  onSubmit: (plan: PricingPlan) => void;
+  buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link" | "brand-purple";
 }
-
-const formSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1, "Plan name is required"),
-  price: z.coerce.number().min(0.01, "Price must be greater than 0"),
-  duration: z.enum(["Monthly", "Yearly"], {
-    required_error: "Duration is required",
-  }),
-});
 
 export function PricingPlanModal({ 
   open, 
   onOpenChange, 
   initialData, 
-  onSubmit 
+  onSubmit,
+  buttonVariant = "default"
 }: PricingPlanModalProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      name: "",
-      price: 0,
-      duration: "Monthly",
-    },
-  });
-
-  // Reset form when initialData changes
-  React.useEffect(() => {
-    if (open) {
-      if (initialData) {
-        form.reset(initialData);
-      } else {
-        form.reset({
-          name: "",
-          price: 0,
-          duration: "Monthly",
-        });
-      }
+  const [name, setName] = useState(initialData?.name || "");
+  const [price, setPrice] = useState(initialData?.price?.toString() || "");
+  const [duration, setDuration] = useState<"Monthly" | "Yearly">(initialData?.duration || "Monthly");
+  
+  // Reset form when modal opens/closes
+  useState(() => {
+    if (open && initialData) {
+      setName(initialData.name || "");
+      setPrice(initialData.price?.toString() || "");
+      setDuration(initialData.duration || "Monthly");
+    } else if (!open) {
+      setName("");
+      setPrice("");
+      setDuration("Monthly");
     }
-  }, [form, initialData, open]);
-
-  const handleSubmit = form.handleSubmit((data) => {
-    onSubmit({
-      id: initialData?.id || "",
-      name: data.name,
-      price: data.price,
-      duration: data.duration,
-    });
   });
-
+  
+  const handleSubmit = () => {
+    const planData: PricingPlan = {
+      id: initialData?.id || "temp-id",
+      name,
+      price: parseFloat(price),
+      duration,
+    };
+    onSubmit(planData);
+  };
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
-            {initialData ? "Edit Pricing Plan" : "Add New Pricing Plan"}
-          </DialogTitle>
-          <DialogDescription>
-            Fill in the details for this pricing plan.
-          </DialogDescription>
+          <DialogTitle>{initialData ? "Edit" : "Add"} Pricing Plan</DialogTitle>
         </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-6 py-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Plan Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter plan name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+        
+        <div className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Plan Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Basic Plan"
             />
-
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        $
-                      </span>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        className="pl-7"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="duration"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Duration</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select duration" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Monthly">Monthly</SelectItem>
-                      <SelectItem value="Yearly">Yearly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" variant="brand-purple">
-                {initialData ? "Update Plan" : "Add Plan"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="price">Price</Label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="0.00"
+                className="pl-7"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label>Billing Cycle</Label>
+            <RadioGroup
+              value={duration}
+              onValueChange={(value) => setDuration(value as "Monthly" | "Yearly")}
+              className="flex space-x-4"
+            >
+              <div className="flex items-center space-x-2">
+                <Radio id="monthly" value="Monthly" />
+                <Label htmlFor="monthly">Monthly</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Radio id="yearly" value="Yearly" />
+                <Label htmlFor="yearly">Yearly</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            variant={buttonVariant}
+          >
+            {initialData ? "Save Changes" : "Add Plan"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -4,6 +4,7 @@ import { WelcomeSection } from "@/components/dashboard/WelcomeSection";
 import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
 import { RecentActivityTable } from "@/components/dashboard/RecentActivityTable";
 import { TopSellingProducts } from "@/components/dashboard/TopSellingProducts";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
 
 // Sample recent orders data
 const recentOrders = [
@@ -128,6 +129,14 @@ export default function Dashboard() {
           bgColor="bg-green-100"
           iconColor="text-green-600"
         />
+      </div>
+
+      {/* Revenue Chart */}
+      <div className="rounded-xl border bg-card p-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-4">Revenue Overview - Monthly revenue for the current year</h2>
+        <div className="h-80">
+          <RevenueChart />
+        </div>
       </div>
       
       {/* Content area with activity and products */}

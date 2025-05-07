@@ -1,7 +1,5 @@
 
-import React from "react";
-import { format } from "date-fns";
-import { Trash2, Pencil } from "lucide-react";
+import { PenLine, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,15 +14,15 @@ import {
 export interface Listing {
   id: number;
   title: string;
-  description?: string;
+  description: string;
   category: string;
   location: string;
   price: number;
   availableFrom: Date;
   availableUntil: Date;
   vendorEmail: string;
-  status: string;
-  image?: File | null;
+  status: "in-stock" | "out-stock" | "low-stock";
+  image?: string;
 }
 
 interface ListingsTableProps {
@@ -34,74 +32,82 @@ interface ListingsTableProps {
 }
 
 export function ListingsTable({ listings, onEdit, onDelete }: ListingsTableProps) {
-  // Status badge component
-  const StatusBadge = ({ status }: { status: string }) => {
-    if (status === "in-stock") {
-      return <Badge className="bg-green-100 text-status-active hover:bg-green-100">In Stock</Badge>;
-    } else if (status === "out-of-stock") {
-      return <Badge className="bg-red-100 text-status-blocked hover:bg-red-100">Out of Stock</Badge>;
-    } else {
-      return <Badge className="bg-yellow-100 text-status-warning hover:bg-yellow-100">Coming Soon</Badge>;
-    }
-  };
-
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-hidden rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Product Title</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Location</TableHead>
+            <TableHead className="w-[350px]">Product</TableHead>
             <TableHead>Price</TableHead>
-            <TableHead>Availability</TableHead>
-            <TableHead>Vendor Email</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {listings.map((listing) => (
-            <TableRow key={listing.id}>
-              <TableCell className="font-medium">{listing.title}</TableCell>
-              <TableCell>{listing.category}</TableCell>
-              <TableCell>{listing.location}</TableCell>
-              <TableCell>${listing.price.toFixed(2)}</TableCell>
-              <TableCell>
-                {format(listing.availableFrom, "MMM d, yyyy")} - {format(listing.availableUntil, "MMM d, yyyy")}
-              </TableCell>
-              <TableCell>{listing.vendorEmail}</TableCell>
-              <TableCell>
-                <StatusBadge status={listing.status} />
-              </TableCell>
-              <TableCell className="text-right space-x-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onEdit(listing)}
-                  className="hover:bg-secondary"
-                >
-                  <Pencil size={18} />
-                  <span className="sr-only">Edit</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onDelete(listing.id)}
-                  className="text-destructive hover:text-destructive/80 hover:bg-destructive/10"
-                >
-                  <Trash2 size={18} />
-                  <span className="sr-only">Delete</span>
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {listings.length === 0 && (
+          {listings.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-6 text-muted-foreground">
-                No listings found
+              <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
+                No listings found.
               </TableCell>
             </TableRow>
+          ) : (
+            listings.map((listing) => (
+              <TableRow key={listing.id}>
+                <TableCell className="font-medium flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                    <img 
+                      src={listing.image || "/placeholder.svg"} 
+                      alt={listing.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="overflow-hidden">
+                    <div className="truncate font-medium max-w-[260px]">{listing.title}</div>
+                    <div className="text-xs text-muted-foreground truncate">{listing.location}</div>
+                  </div>
+                </TableCell>
+                <TableCell>${listing.price.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      listing.status === "in-stock"
+                        ? "default"
+                        : listing.status === "low-stock"
+                          ? "outline"
+                          : "secondary"
+                    }
+                  >
+                    {listing.status === "in-stock"
+                      ? "In Stock"
+                      : listing.status === "low-stock"
+                        ? "Low Stock"
+                        : "Out of Stock"}
+                  </Badge>
+                </TableCell>
+                <TableCell>{listing.category}</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Button
+                    onClick={() => onEdit(listing)}
+                    size="icon"
+                    variant="ghost"
+                    className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                  >
+                    <PenLine className="h-4 w-4" />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <Button
+                    onClick={() => onDelete(listing.id)}
+                    size="icon"
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
           )}
         </TableBody>
       </Table>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Dialog,
@@ -7,6 +8,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -18,7 +29,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -95,10 +105,12 @@ type AdminFormValues = z.infer<typeof adminFormSchema>;
 export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("All");
-  const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
+  const [admins, setAdmins] = useState<AdminUser[]>(sampleAdmins);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentAdmin, setCurrentAdmin] = useState<AdminUser | null>(null);
+  const [adminToDelete, setAdminToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Initialize the form
   const form = useForm<AdminFormValues>({
@@ -112,29 +124,11 @@ export default function AdminUsersPage() {
   });
 
   // Filter admins based on search term and role filter
-  const filteredAdmins = sampleAdmins.filter(admin => {
+  const filteredAdmins = admins.filter(admin => {
     const matchesSearch = admin.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "All" || admin.role === roleFilter;
     return matchesSearch && matchesRole;
   });
-
-  // Handle checkbox selection
-  const handleCheckboxChange = (adminId: string) => {
-    setSelectedAdmins(prev =>
-      prev.includes(adminId)
-        ? prev.filter(id => id !== adminId)
-        : [...prev, adminId]
-    );
-  };
-
-  // Handle select all
-  const handleSelectAll = () => {
-    if (selectedAdmins.length === filteredAdmins.length) {
-      setSelectedAdmins([]);
-    } else {
-      setSelectedAdmins(filteredAdmins.map(admin => admin.id));
-    }
-  };
 
   // Handle add admin modal
   const handleAddAdminClick = () => {
@@ -154,19 +148,40 @@ export default function AdminUsersPage() {
 
   // Handle delete admin
   const handleDeleteAdmin = (adminId: string) => {
-    console.log(`Delete admin with id: ${adminId}`);
-    toast.success("Admin user deleted successfully");
-    // In a real application, this would call an API to delete the admin
+    setAdminToDelete(adminId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Confirm delete
+  const confirmDelete = () => {
+    if (adminToDelete) {
+      setAdmins(admins.filter(admin => admin.id !== adminToDelete));
+      toast.success("Admin user deleted successfully");
+      setAdminToDelete(null);
+      setIsDeleteDialogOpen(false);
+    }
   };
 
   // Form submit handler
   const onSubmit = (data: AdminFormValues) => {
     if (isEditModalOpen && currentAdmin) {
-      console.log("Edit admin", { id: currentAdmin.id, ...data });
+      // Update existing admin
+      setAdmins(admins.map(admin => 
+        admin.id === currentAdmin.id 
+          ? { ...admin, name: data.name, email: data.email, role: data.role } 
+          : admin
+      ));
       toast.success("Admin user updated successfully");
       setIsEditModalOpen(false);
     } else {
-      console.log("Add admin", data);
+      // Add new admin
+      const newAdmin: AdminUser = {
+        id: (admins.length + 1).toString(),
+        name: data.name,
+        email: data.email,
+        role: data.role,
+      };
+      setAdmins([...admins, newAdmin]);
       toast.success("Admin user added successfully");
       setIsAddModalOpen(false);
     }
@@ -179,9 +194,9 @@ export default function AdminUsersPage() {
         <h1 className="text-2xl font-bold tracking-tight">Admin Management</h1>
         <Button 
           onClick={handleAddAdminClick}
-          className="flex items-center gap-1 bg-[#9b87f5] hover:bg-[#8a76e5]"
+          variant="brand-purple"
         >
-          <UserPlus className="h-4 w-4" />
+          <UserPlus className="h-4 w-4 mr-2" />
           Add Admin
         </Button>
       </div>
@@ -215,12 +230,6 @@ export default function AdminUsersPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[50px]">
-                <Checkbox 
-                  checked={selectedAdmins.length === filteredAdmins.length && filteredAdmins.length > 0}
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
               <TableHead>Admin Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
@@ -230,19 +239,13 @@ export default function AdminUsersPage() {
           <TableBody>
             {filteredAdmins.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
                   No admin users found
                 </TableCell>
               </TableRow>
             ) : (
               filteredAdmins.map((admin) => (
                 <TableRow key={admin.id}>
-                  <TableCell>
-                    <Checkbox 
-                      checked={selectedAdmins.includes(admin.id)}
-                      onCheckedChange={() => handleCheckboxChange(admin.id)}
-                    />
-                  </TableCell>
                   <TableCell className="font-medium">{admin.name}</TableCell>
                   <TableCell>{admin.email}</TableCell>
                   <TableCell>
@@ -370,7 +373,7 @@ export default function AdminUsersPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Add Admin</Button>
+                <Button type="submit" variant="brand-purple">Add Admin</Button>
               </DialogFooter>
             </form>
           </Form>
@@ -469,12 +472,30 @@ export default function AdminUsersPage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Update Admin</Button>
+                <Button type="submit" variant="brand-purple">Update Admin</Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm to delete this admin user?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently remove the admin account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600">
+              Yes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

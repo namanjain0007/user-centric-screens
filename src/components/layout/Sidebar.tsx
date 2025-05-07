@@ -9,13 +9,11 @@ import {
   Settings,
   HelpCircle,
   CreditCard,
-  Search,
   ListOrdered,
   Shield,
   DollarSign,
   FolderTree,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 
 interface NavItemProps {
   href: string;
@@ -77,15 +75,6 @@ export function Sidebar() {
         </Link>
       </div>
       <div className="flex flex-col gap-6 p-4 overflow-y-auto">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full bg-background/80 pl-8"
-          />
-        </div>
-
         <NavSection title="Dashboard">
           <NavItem
             href="/dashboard"

@@ -23,9 +23,8 @@ export function PricingPlanModal({
 }: PricingPlanModalProps) {
   const [name, setName] = useState(initialData?.name || "");
   const [price, setPrice] = useState(initialData?.price?.toString() || "");
-  const [duration, setDuration] = useState<"Monthly" | "Yearly">(initialData?.duration || "Monthly");
+  const [duration, setDuration] = useState<"Monthly" | "Quarterly" | "Six Month" | "Yearly">(initialData?.duration || "Monthly");
   
-  // Reset form when modal opens/closes
   useState(() => {
     if (open && initialData) {
       setName(initialData.name || "");
@@ -86,12 +85,20 @@ export function PricingPlanModal({
             <Label>Billing Cycle</Label>
             <RadioGroup
               value={duration}
-              onValueChange={(value) => setDuration(value as "Monthly" | "Yearly")}
-              className="flex space-x-4"
+              onValueChange={(value) => setDuration(value as "Monthly" | "Quarterly" | "Six Month" | "Yearly")}
+              className="grid grid-cols-2 gap-4"
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="monthly" value="Monthly" />
                 <Label htmlFor="monthly">Monthly</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem id="quarterly" value="Quarterly" />
+                <Label htmlFor="quarterly">Quarterly</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem id="six-month" value="Six Month" />
+                <Label htmlFor="six-month">Six Month</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="yearly" value="Yearly" />

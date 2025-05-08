@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { CategoryFormModal } from "@/components/categories/CategoryFormModal";
 import { CategoriesTable } from "@/components/categories/CategoriesTable";
@@ -47,6 +46,25 @@ export default function CategoriesPage() {
       setCategories([...categories, newCategory]);
       return true;
     } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleBulkAddCategories = async (names: string[]) => {
+    try {
+      const newCategories = await Promise.all(names.map(name => addCategory(name)));
+      setCategories([...categories, ...newCategories]);
+      toast({
+        title: "Success",
+        description: `Added ${names.length} categories successfully`,
+      });
+      return true;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add categories",
+        variant: "destructive",
+      });
       throw error;
     }
   };
@@ -112,6 +130,7 @@ export default function CategoriesPage() {
         open={isAddModalOpen}
         onOpenChange={setIsAddModalOpen}
         onSubmit={handleAddCategory}
+        onBulkSubmit={handleBulkAddCategories}
         mode="add"
         buttonVariant="brand-purple"
       />

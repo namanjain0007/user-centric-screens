@@ -1,4 +1,3 @@
-
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
@@ -11,7 +10,7 @@ export default function Layout() {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path === "/users") return "User Management";
-    if (path === "/admin") return "Admin Management";
+    if (path === "/admin") return "Admin Users";
     if (path === "/notifications") return "Notifications";
     if (path === "/categories") return "Categories";
     if (path === "/listings") return "Listing Management";

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog,
@@ -191,7 +190,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Admin Management</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Admin User</h1>
         <Button 
           onClick={handleAddAdminClick}
           variant="brand-purple"

@@ -101,7 +101,7 @@ export function RentalPrimaSidebar() {
                     "flex items-center gap-3 px-7 py-3 mx-2 my-0.5 rounded-xl font-medium text-base transition-all select-none",
                     "text-white/80 hover:bg-white/15 hover:text-white focus:outline-none",
                     isActive &&
-                      "bg-white text-[#0073B1] font-semibold shadow-lg pointer-events-none"
+                      "bg-white text-[#1995dd] font-semibold shadow-lg pointer-events-none"
                   )}
                   style={{
                     minHeight: 48,
@@ -112,7 +112,7 @@ export function RentalPrimaSidebar() {
                   <item.icon
                     size={21}
                     className={clsx(
-                      isActive ? "text-[#0073B1]" : "text-white/80",
+                      isActive ? "text-[#1995dd]" : "text-white/80",
                       "transition-colors"
                     )}
                   />

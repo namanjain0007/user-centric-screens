@@ -147,7 +147,11 @@ export default function AdminUsersPage() {
     form.setValue("name", admin.name);
     form.setValue("email", admin.email);
     form.setValue("password", "");
-    form.setValue("admin_user_type", admin.role);
+    // Cast admin.role to the correct union type
+    form.setValue(
+      "admin_user_type",
+      admin.role as AdminFormValues["admin_user_type"]
+    );
     setIsEditModalOpen(true);
   };
 

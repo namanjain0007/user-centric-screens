@@ -141,16 +141,19 @@ export default function AdminUsersPage() {
     setIsAddModalOpen(true);
   };
 
-  // Handle edit admin
-  const handleEditAdmin = (admin: AdminUser) => {
-    setCurrentAdmin(admin);
+  const allowedRoles = ["super_admin", "sub_admin", "manager", "accountant"] as const;
+
+  const handleEditAdmin = (admin: any) => {
     form.setValue("name", admin.name);
     form.setValue("email", admin.email);
     form.setValue("password", "");
-    // Cast admin.role to the correct union type
+    // Only allow the correct union type for admin_user_type
+    const adminUserType = allowedRoles.includes(admin.role)
+      ? admin.role
+      : "sub_admin";
     form.setValue(
       "admin_user_type",
-      admin.role as AdminFormValues["admin_user_type"]
+      adminUserType as (typeof allowedRoles)[number]
     );
     setIsEditModalOpen(true);
   };

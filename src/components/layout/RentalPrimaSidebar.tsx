@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -100,9 +99,9 @@ export function RentalPrimaSidebar() {
                   to={item.href}
                   className={clsx(
                     "flex items-center gap-3 px-7 py-3 mx-2 my-0.5 rounded-xl font-medium text-base transition-all select-none",
-                    "text-white hover:bg-white/15 hover:text-white focus:outline-none",
+                    "text-white/80 hover:bg-white/15 hover:text-white focus:outline-none",
                     isActive &&
-                      "bg-white text-[#034e7a] font-bold shadow-lg pointer-events-none"
+                      "bg-white text-[#0073B1] font-semibold shadow-lg pointer-events-none"
                   )}
                   style={{
                     minHeight: 48,
@@ -113,7 +112,7 @@ export function RentalPrimaSidebar() {
                   <item.icon
                     size={21}
                     className={clsx(
-                      isActive ? "text-[#0285c7]" : "text-white",
+                      isActive ? "text-[#0073B1]" : "text-white/80",
                       "transition-colors"
                     )}
                   />
@@ -128,13 +127,13 @@ export function RentalPrimaSidebar() {
       <div className="mb-2 mt-6 px-5">
         <Link
           to={logoutItem.href}
-          className="flex items-center gap-3 px-7 py-3 rounded-xl text-white font-medium text-base transition-all hover:bg-white/15 hover:text-white"
+          className="flex items-center gap-3 px-7 py-3 rounded-xl text-white/80 font-medium text-base transition-all hover:bg-white/15 hover:text-white"
           style={{
             minHeight: 48,
             letterSpacing: "0.01em",
           }}
         >
-          <logoutItem.icon size={20} className="text-white" />
+          <logoutItem.icon size={20} className="text-white/80" />
           <span>{logoutItem.label}</span>
         </Link>
       </div>

@@ -1,5 +1,6 @@
+
 import { Outlet } from "react-router-dom";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { RentalPrimaSidebar } from "@/components/layout/RentalPrimaSidebar";
 import { Header } from "@/components/layout/Header";
 import { useLocation } from "react-router-dom";
 
@@ -22,8 +23,8 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar />
+    <div className="flex h-screen bg-background overflow-hidden">
+      <RentalPrimaSidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header title={getPageTitle()} />
         <main className="flex-1 overflow-auto p-6">
